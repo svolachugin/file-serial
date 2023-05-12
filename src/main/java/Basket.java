@@ -1,6 +1,10 @@
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 
-public class Basket {
+public class Basket implements Serializable {
     protected String[] products;
     protected int[] prices;
     protected int[] productsBuy;
@@ -55,7 +59,7 @@ public class Basket {
 
             String[] pricesStr = br.readLine().split("@");
             int[] prices = new int[pricesStr.length];
-            for (int i=0; i < pricesStr.length; i++) {
+            for (int i = 0; i < pricesStr.length; i++) {
                 prices[i] = Integer.parseInt(pricesStr[i]);
             }
 
@@ -70,5 +74,28 @@ public class Basket {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    public static void saveJson(File fileJson, Basket basket) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        try (FileWriter writer = new FileWriter(fileJson)) {
+            writer.write(gson.toJson(basket));
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Basket loadFromJsonFile(File fileJson) {
+        Basket basket;
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        try (FileReader reader = new FileReader(fileJson)) {
+            basket = gson.fromJson(reader, Basket.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return basket;
     }
 }
